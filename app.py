@@ -6,69 +6,89 @@ import plotly.express as px
 import tensorflow as tf
 from data_prep import DataProcessor, DataLoading
 from model import TimeSeriesModel
+import plotly.graph_objects as go
 
-def main():
-    st.title("Climate Time Series Prediction")
+@st.cache_resource
+def fetch_data():
     preprocessor = DataLoading('jena_climate_2009_2016.csv')
     climate_df = preprocessor.preprocess_data()
     preprocessor.rename_columns()
     model = tf.keras.models.load_model("rnn_model.h5")
+    return climate_df, model
 
-    # Plot the  column against the index (time)
-    plt.figure(figsize=(10, 6))
-    plt.plot(climate_df['Date Time'], climate_df["Temperature (degC)"], color='salmon')
-    plt.xlabel('Year')
-    plt.ylabel('Temperature (degC)')
-    plt.title(f'Jena Climate Temperature (degC) Data')
-    plt.grid(True)
+def plot_climate_data(climate_df):
+    fig = go.Figure()
 
-    # display the plot
-    st.pyplot(plt)
+    fig.add_trace(go.Scatter(x=climate_df['Date Time'], y=climate_df["Temperature (degC)"],
+                             mode='lines', name='Temperature (degC)', line=dict(color='salmon')))
 
-    st.title("Prediction")
+    fig.update_layout(title='Jena Climate Temperature (degC) Data',
+                      xaxis_title='Year', yaxis_title='Temperature (degC)',
+                      width=1000, height=600, showlegend=True)
 
-    split_time = 294000
+    fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor='lightgrey')
+    fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='lightgrey')
+
+    # Display the plot
+    st.plotly_chart(fig)
+
+def plot_future_forecast(model, series, time_valid, window_size, future_months=36):
+    last_timestamp = time_valid[-1]
+    future_time_steps = future_months * 30 * 24 * 6  # Assuming 30 days per month (24 hours * 6 10-minute intervals per hour)
+    future_time = pd.date_range(start=last_timestamp, periods=future_time_steps+1, freq='10T')[1:]
+    timeseries = TimeSeriesModel(window_size=window_size, learning_rate=1e-3)
+    future_forecast = timeseries.model_forecast(model, series, window_size).squeeze()
+    future_forecast = future_forecast[-future_time_steps:]
+
+    # Create a Plotly figure
+    fig = go.Figure()
+
+    # Plot the actual data
+    fig.add_trace(go.Scatter(x=time_valid, y=series, mode='lines', name='Actual Data', line=dict(color='salmon')))
+
+    # Plot the predicted data (future forecast)
+    fig.add_trace(go.Scatter(x=future_time, y=future_forecast, mode='lines', name='Predicted Data (Future)', line=dict(color='green')))
+
+    # Set axis labels and title
+    fig.update_layout(title='Actual vs. Predicted Data', xaxis_title='Time', yaxis_title='Value', width=1000, height=600)
+
+    # Increase the y-axis range to place the future forecast trace above the plot
+    y_range_padding = (max(future_forecast) - min(future_forecast)) * 0.1  
+    fig.update_yaxes(range=[min(future_forecast) - y_range_padding, max(future_forecast) + y_range_padding])
+
+    # Show the figure
+    st.plotly_chart(fig)
+
+
+
+
+
+# Main Streamlit app
+def streamlit_app():
+    
+    climate_df, model = fetch_data()
+    # Plot climate data
+    plot_climate_data(climate_df)
+
+    #Preprocess data
     window_size = 64
-    batch_size = 256
-    shuffle_buffer_size = 1000
-    data_processor = DataProcessor(window_size, batch_size, shuffle_buffer_size)
+    data_processor = DataProcessor(window_size, batch_size=256, shuffle_buffer_size=1000)
     times, temperatures = data_processor.parse_data_from_dataframe(climate_df, 'Temperature (degC)')
     time = np.array(times)
     series = np.array(temperatures)
-    time_train, series_trainset, time_valid, series_validset = data_processor.train_val_split(time, series, split_time)
+    time_train, series_trainset, time_valid, series_validset = data_processor.train_val_split(time, series, time_step=294000)
 
-    last_timestamp = time_valid[-1]
+    # Select time duration for future predictions
+    # time_duration = st.selectbox("Select Time Duration for Predictions", ["6 months", "1 year", "2 years", "3 years"])
 
-    # selecting the time duration for future predictions
-    time_duration = st.selectbox("Select Time Duration for Predictions", ["6 months", "1 year", "2 years", "3 years"])
-    if time_duration == "6 months":
-        future_time_steps = int(6 * 30 * 24)  # 6 months (approx. 30 days * 24 hours)
-    elif time_duration == "1 year":
-        future_time_steps = int(1 * 365 * 24)  # 1 year (365 days * 24 hours)
-    elif time_duration == "2 years":
-        future_time_steps = int(2 * 365 * 24)  # 2 years (365 days * 24 hours * 2)
-    else:
-        future_time_steps = int(3 * 365 * 24)  # 3 years (365 days * 24 hours * 3)
-
-    future_time = np.arange(last_timestamp + 1, last_timestamp + 1 + future_time_steps)
-
-    climate_df.set_index('Date Time', inplace=True)
-
-    
+    # Perform forecasting
     with st.spinner("Forecasting..."):
+        window_size = 64
+        future_months = 36
+        plot_future_forecast(model, series_validset, time_valid, window_size, future_months)
 
-        timeseries = TimeSeriesModel(window_size=window_size, learning_rate=1e-3)
-        future_forecast = timeseries.model_forecast(model, series, window_size).squeeze()
-        future_forecast = future_forecast[-future_time_steps:]
 
-    # Display the plot
-    plt.figure(figsize=(10, 6))
-    plt.plot(time_valid, series_validset, format='-', label='Actual Data', color='blue')
-    plt.plot(future_time, future_forecast, format='-', label='Predicted Data (Future)', color='green')
-    plt.legend()
-    plt.title(f'Actual vs. Predicted Data (Validation and Future) - {time_duration} Forecast')
 
-    st.pyplot(plt)
-
+# Run the Streamlit app
 if __name__ == "__main__":
-    main()
+    streamlit_app()
