@@ -60,12 +60,12 @@ class TimeSeriesModel:
         mae = tf.keras.metrics.mean_absolute_error(true_series, forecast).numpy()
         return mse, mae
 
-    def model_forecast(self, series, window_size):
+    def model_forecast(self,model, series, window_size):
         ds = tf.data.Dataset.from_tensor_slices(series)
         ds = ds.window(window_size, shift=1, drop_remainder=True)
         ds = ds.flat_map(lambda w: w.batch(window_size))
         ds = ds.batch(128).prefetch(1)
-        forecast = self.model.predict(ds)
+        forecast = model.predict(ds)
         return forecast
 
     def plot_series(self, time, series, format="-", start=0, end=None):
