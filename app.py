@@ -32,10 +32,11 @@ def plot_climate_data(climate_df):
     # Display the plot
     st.plotly_chart(fig)
 
-def plot_future_forecast(model, series, time_valid, window_size, future_months=36):
+def plot_future_forecast(model, series, time_valid, window_size, future_months):
     last_timestamp = time_valid[-1]
     future_time_steps = future_months * 30 * 24 * 6  # Assuming 30 days per month (24 hours * 6 10-minute intervals per hour)
     future_time = pd.date_range(start=last_timestamp, periods=future_time_steps+1, freq='10T')[1:]
+
     timeseries = TimeSeriesModel(window_size=window_size, learning_rate=1e-3)
     future_forecast = timeseries.model_forecast(model, series, window_size).squeeze()
     future_forecast = future_forecast[-future_time_steps:]
@@ -76,7 +77,7 @@ def streamlit_app():
     times, temperatures = data_processor.parse_data_from_dataframe(climate_df, 'Temperature (degC)')
     time = np.array(times)
     series = np.array(temperatures)
-    time_train, series_trainset, time_valid, series_validset = data_processor.train_val_split(time, series, time_step=294000)
+    time_train, series_trainset, time_valid, series_validset = data_processor.train_val_split(climate_df.index, series, time_step=294000)
 
     # Select time duration for future predictions
     # time_duration = st.selectbox("Select Time Duration for Predictions", ["6 months", "1 year", "2 years", "3 years"])
