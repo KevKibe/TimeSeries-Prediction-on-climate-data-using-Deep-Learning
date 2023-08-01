@@ -24,7 +24,7 @@ def plot_climate_data(climate_df):
 
     fig.update_layout(title='Jena Climate Temperature (degC) Data',
                       xaxis_title='Year', yaxis_title='Temperature (degC)',
-                      width=1000, height=1000, showlegend=True)
+                      width=1000, height=500, showlegend=True)
 
     fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor='lightgrey')
     fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='lightgrey')
@@ -41,24 +41,18 @@ def plot_future_forecast(model, series, time_valid, window_size, future_months):
     future_forecast = timeseries.model_forecast(model, series, window_size).squeeze()
     future_forecast = future_forecast[-future_time_steps:]
 
-    # Create a Plotly figure
-    fig = go.Figure()
+    fig2 = go.Figure()
 
-    # Plot the actual data
-    fig.add_trace(go.Scatter(x=time_valid, y=series, mode='lines', name='Actual Data', line=dict(color='salmon')))
+    fig2.add_trace(go.Scatter(x=time_valid, y=series, mode='lines', name='Actual Data', line=dict(color='salmon')))
 
-    # Plot the predicted data (future forecast)
-    fig.add_trace(go.Scatter(x=future_time, y=future_forecast, mode='lines', name='Predicted Data (Future)', line=dict(color='green')))
+    fig2.add_trace(go.Scatter(x=future_time, y=future_forecast, mode='lines', name='Predicted Data (Future)', line=dict(color='green')))
 
-    # Set axis labels and title
-    fig.update_layout(title='Actual vs. Predicted Data', xaxis_title='Time', yaxis_title='Value', width=1000, height=1000)
+    fig2.update_layout(title='Actual vs. Predicted Data', xaxis_title='Time', yaxis_title='Value', width=1000, height=500)
 
-    # Increase the y-axis range to place the future forecast trace above the plot
     y_range_padding = (max(future_forecast) - min(future_forecast)) * 0.1  
-    fig.update_yaxes(range=[min(future_forecast) - y_range_padding, max(future_forecast) + y_range_padding])
+    fig2.update_yaxes(range=[min(future_forecast) - y_range_padding, max(future_forecast) + y_range_padding])
 
-    # Show the figure
-    st.plotly_chart(fig)
+    st.plotly_chart(fig2)
 
 
 
@@ -84,7 +78,7 @@ def streamlit_app():
 
     # Perform forecasting
     # with st.spinner("Forecasting..."):
-    window_size = 64
+    
     future_months = 36
     plot_future_forecast(model, series_validset, time_valid, window_size, future_months)
 
