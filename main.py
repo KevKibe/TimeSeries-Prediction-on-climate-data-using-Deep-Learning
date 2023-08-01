@@ -20,7 +20,7 @@ data_processor = DataProcessor(window_size, batch_size, shuffle_buffer_size)
 times, temperatures = data_processor.parse_data_from_dataframe(climate_df, 'Temperature (degC)')
 time = np.array(times)
 series = np.array(temperatures)
-time_train, series_trainset, time_valid, series_validset = data_processor.train_val_split(time, series, split_time)
+time_train, series_trainset, time_valid, series_validset = data_processor.train_val_split(climate_df.index, series, split_time)
 
 # Create the training dataset
 training_data = data_processor.windowed_dataset(series_trainset)
