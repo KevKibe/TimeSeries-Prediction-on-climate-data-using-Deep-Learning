@@ -15,35 +15,8 @@
 
 
 
-# Project Name
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-## Description
-
-Briefly describe your project in a few sentences. Mention the main features and purpose of the project.
-
-## Table of Contents
-
-- [Project Name](#project-name)
-  - [Description](#description)
-  - [Table of Contents](#table-of-contents)
-  - [Installation](#installation)
-  - [Usage](#usage)
-  - [Data](#data)
-  - [Model](#model)
-  - [Results](#results)
-  - [Contributing](#contributing)
-  - [License](#license)
-  - [Contact](#contact)
-
-## Installation
-
-Describe how to install the project, including any prerequisites or dependencies needed to run the code. Provide step-by-step instructions to set up the environment.
-
-## Usage
-
-Explain how to use the project. Include examples of how to run the code, and if applicable, how to use any provided command-line arguments or parameters.
 
 ## Data
 
