@@ -8,7 +8,7 @@ from data_prep import DataProcessor, DataLoading
 from model import TimeSeriesModel
 import plotly.graph_objects as go
 
-@st.cache_resource
+# @st.cache_resource
 def fetch_data():
     preprocessor = DataLoading('jena_climate_2009_2016.csv')
     climate_df = preprocessor.preprocess_data()
@@ -24,7 +24,7 @@ def plot_climate_data(climate_df):
 
     fig.update_layout(title='Jena Climate Temperature (degC) Data',
                       xaxis_title='Year', yaxis_title='Temperature (degC)',
-                      width=1000, height=600, showlegend=True)
+                      width=1000, height=1000, showlegend=True)
 
     fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor='lightgrey')
     fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='lightgrey')
@@ -51,7 +51,7 @@ def plot_future_forecast(model, series, time_valid, window_size, future_months):
     fig.add_trace(go.Scatter(x=future_time, y=future_forecast, mode='lines', name='Predicted Data (Future)', line=dict(color='green')))
 
     # Set axis labels and title
-    fig.update_layout(title='Actual vs. Predicted Data', xaxis_title='Time', yaxis_title='Value', width=1000, height=600)
+    fig.update_layout(title='Actual vs. Predicted Data', xaxis_title='Time', yaxis_title='Value', width=1000, height=1000)
 
     # Increase the y-axis range to place the future forecast trace above the plot
     y_range_padding = (max(future_forecast) - min(future_forecast)) * 0.1  
@@ -83,10 +83,10 @@ def streamlit_app():
     # time_duration = st.selectbox("Select Time Duration for Predictions", ["6 months", "1 year", "2 years", "3 years"])
 
     # Perform forecasting
-    with st.spinner("Forecasting..."):
-        window_size = 64
-        future_months = 36
-        plot_future_forecast(model, series_validset, time_valid, window_size, future_months)
+    # with st.spinner("Forecasting..."):
+    window_size = 64
+    future_months = 36
+    plot_future_forecast(model, series_validset, time_valid, window_size, future_months)
 
 
 
