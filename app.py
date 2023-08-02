@@ -82,7 +82,8 @@ def streamlit_app():
     future_years = st.slider("Select Years into the Future for Forecasting(takes approx. 2mins)", 0, 1, 10)
     future_months = future_years * 12
     window_size = 64
-    plot_future_forecast(model=model, series=series_validset, time_valid=time_valid, window_size = window_size,
+    with st.spinner("Forecasting..."):
+        plot_future_forecast(model=model, series=series_validset, time_valid=time_valid, window_size = window_size,
                          future_months=future_months)
 
 
