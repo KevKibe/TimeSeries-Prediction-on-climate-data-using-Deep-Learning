@@ -51,8 +51,8 @@ def plot_future_forecast(model, series, time_valid, window_size, future_months):
     last_timestamp = time_valid[-1]
     future_time_steps = future_months * 30 * 24 * 6  # Assuming 30 days per month (24 hours * 6 10-minute intervals per hour)
     future_time = pd.date_range(start=last_timestamp, periods=future_time_steps+1, freq='10T')[1:]
-    model_forecast = ModelEval()
-    future_forecast = model_forecast.model_forecast(model, series, window_size, future_time_steps)
+    
+    future_forecast = ModelEval.model_forecast(model, series, window_size, future_time_steps)
 
     fig = go.Figure()
 
