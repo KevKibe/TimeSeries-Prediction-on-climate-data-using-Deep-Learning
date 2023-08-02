@@ -47,30 +47,26 @@ def preprocess_data():
     return model, climate_df, series_validset, time_valid
 
 
-def plot_future_forecast(model, series, time_valid, future_months):
+def plot_future_forecast(model, series, time_valid, window_size, future_months):
     last_timestamp = time_valid[-1]
     future_time_steps = future_months * 30 * 24 * 6  # Assuming 30 days per month (24 hours * 6 10-minute intervals per hour)
     future_time = pd.date_range(start=last_timestamp, periods=future_time_steps+1, freq='10T')[1:]
 
-    model_eval = ModelEval()
-    future_forecast = model_eval.model_forecast(model, series, window_size=64).squeeze()
-    future_forecast = future_forecast[-future_time_steps:]
+    future_forecast = ModelEval.model_forecast(model, series, window_size, future_time_steps)
 
-    fig2 = go.Figure()
+    fig = go.Figure()
 
-    fig2.add_trace(go.Scatter(x=time_valid, y=series,
-                              mode='lines', name='Actual Data', line=dict(color='salmon')))
+    # Plot the actual data
+    fig.add_trace(go.Scattergl(x=time_valid, y=series, mode='lines', name='Actual Data', line=dict(color='salmon')))
 
-    fig2.add_trace(go.Scatter(x=future_time, y=future_forecast,
-                              mode='lines', name='Predicted Data (Future)', line=dict(color='green')))
+    # Plot the predicted data (future forecast)
+    fig.add_trace(go.Scattergl(x=future_time, y=future_forecast, mode='lines', name='Predicted Data (Future)', line=dict(color='green')))
 
-    fig2.update_layout(title='Actual vs. Predicted Data', xaxis_title='Time',
-                       yaxis_title='Value', width=1000, height=500)
+    # Set axis labels and title
+    fig.update_layout(title='Actual vs. Predicted Data', xaxis_title='Time', yaxis_title='Value', width=1000, height=600)
 
-    y_range_padding = (max(future_forecast) - min(future_forecast)) * 0.1
-    fig2.update_yaxes(range=[min(future_forecast) - y_range_padding, max(future_forecast) + y_range_padding])
-
-    st.plotly_chart(fig2)
+    # Show the figure
+    st.plotly_chart(fig)
 
 
 def streamlit_app():
@@ -83,10 +79,10 @@ def streamlit_app():
     
 
     # Add a slider to select the number of years into the future for forecasting
-    future_years = st.slider("Select Years into the Future for Forecasting(takes apprx. 1.5mins)", 0, 1, 10)
+    future_years = st.slider("Select Years into the Future for Forecasting(takes approx. 2mins)", 0, 1, 10)
     future_months = future_years * 12
-
-    plot_future_forecast(model=model, series=series_validset, time_valid=time_valid,
+    window_size = 64
+    plot_future_forecast(model=model, series=series_validset, window_size = window_size,time_valid=time_valid,
                          future_months=future_months)
 
 

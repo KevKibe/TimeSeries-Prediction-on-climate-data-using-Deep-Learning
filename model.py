@@ -1,5 +1,6 @@
 import tensorflow as tf
 import matplotlib as plt
+import numpy as np
 
 class TimeSeriesModel:
     def __init__(self, window_size=64, learning_rate=1e-3):
@@ -62,13 +63,19 @@ class ModelEval():
         return mse, mae
     
     @staticmethod
-    def model_forecast(model, series, window_size):
-        ds = tf.data.Dataset.from_tensor_slices(series)
-        ds = ds.window(window_size, shift=1, drop_remainder=True)
-        ds = ds.flat_map(lambda w: w.batch(window_size))
-        ds = ds.batch(128).prefetch(1)
-        forecast = model.predict(ds)
-        return forecast
+    def model_forecast(model, series, window_size, future_steps):
+        dataset = tf.data.Dataset.from_tensor_slices(series)
+        dataset = dataset.window(window_size, shift=1, drop_remainder=True)
+        dataset = dataset.flat_map(lambda w: w.batch(window_size))
+        dataset = dataset.batch(128).prefetch(1)
+        forecast = model.predict(dataset)
+
+        future_forecast = []
+
+        for batch in forecast:
+            future_forecast.extend(batch[-future_steps:])
+
+        return np.array(future_forecast).squeeze()
     
     @staticmethod
     def plot_series( time, series, format="-", start=0, end=None, label=None, color=None):
