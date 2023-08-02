@@ -5,10 +5,10 @@ import matplotlib.pyplot as plt
 import plotly.express as px
 import tensorflow as tf
 from data_prep import DataProcessor, DataLoading
-from model import TimeSeriesModel
+from model import TimeSeriesModel, ModelEval
 import plotly.graph_objects as go
 
-# @st.cache_resource
+# @st.cache
 def fetch_data():
     preprocessor = DataLoading('jena_climate_2009_2016.csv')
     climate_df = preprocessor.preprocess_data()
@@ -31,29 +31,6 @@ def plot_climate_data(climate_df):
 
     # Display the plot
     st.plotly_chart(fig)
-
-def plot_future_forecast(model, series, time_valid, window_size, future_months):
-    last_timestamp = time_valid[-1]
-    future_time_steps = future_months * 30 * 24 * 6  # Assuming 30 days per month (24 hours * 6 10-minute intervals per hour)
-    future_time = pd.date_range(start=last_timestamp, periods=future_time_steps+1, freq='10T')[1:]
-
-    timeseries = TimeSeriesModel(window_size=window_size, learning_rate=1e-3)
-    future_forecast = timeseries.model_forecast(model, series, window_size).squeeze()
-    future_forecast = future_forecast[-future_time_steps:]
-
-    fig2 = go.Figure()
-
-    fig2.add_trace(go.Scatter(x=time_valid, y=series, mode='lines', name='Actual Data', line=dict(color='salmon')))
-
-    fig2.add_trace(go.Scatter(x=future_time, y=future_forecast, mode='lines', name='Predicted Data (Future)', line=dict(color='green')))
-
-    fig2.update_layout(title='Actual vs. Predicted Data', xaxis_title='Time', yaxis_title='Value', width=1000, height=500)
-
-    y_range_padding = (max(future_forecast) - min(future_forecast)) * 0.1  
-    fig2.update_yaxes(range=[min(future_forecast) - y_range_padding, max(future_forecast) + y_range_padding])
-
-    st.plotly_chart(fig2)
-
 
 
 
@@ -78,11 +55,34 @@ def streamlit_app():
 
     # Perform forecasting
     # with st.spinner("Forecasting..."):
-    
+    def plot_future_forecast(model, series, time_valid, window_size, future_months):
+        last_timestamp = time_valid[-1]
+        future_time_steps = future_months * 30 * 24 * 6  # Assuming 30 days per month (24 hours * 6 10-minute intervals per hour)
+        future_time = pd.date_range(start=last_timestamp, periods=future_time_steps+1, freq='10T')[1:]
+        window_size = 64
+        data_processor = DataProcessor(window_size, batch_size=256, shuffle_buffer_size=1000)
+        times, temperatures = data_processor.parse_data_from_dataframe(climate_df, 'Temperature (degC)')
+        time = np.array(times)
+        series = np.array(temperatures)
+        time_train, series_trainset, time_valid, series_validset = data_processor.train_val_split(climate_df.index, series, time_step=294000)
+        future_forecast = ModelEval.model_forecast(model, series, window_size = 64).squeeze()
+        future_forecast = future_forecast[-future_time_steps:]
+
+        fig2 = go.Figure()
+
+        fig2.add_trace(go.Scatter(x=time_valid, y=series, mode='lines', name='Actual Data', line=dict(color='salmon')))
+
+        fig2.add_trace(go.Scatter(x=future_time, y=future_forecast, mode='lines', name='Predicted Data (Future)', line=dict(color='green')))
+
+        fig2.update_layout(title='Actual vs. Predicted Data', xaxis_title='Time', yaxis_title='Value', width=1000, height=500)
+
+        y_range = [min(min(series), min(future_forecast)) - 1, max(max(series), max(future_forecast)) + 1]
+        fig2.update_yaxes(range=y_range)
+
+        st.plotly_chart(fig2)
+
     future_months = 36
     plot_future_forecast(model, series_validset, time_valid, window_size, future_months)
-
-
 
 # Run the Streamlit app
 if __name__ == "__main__":

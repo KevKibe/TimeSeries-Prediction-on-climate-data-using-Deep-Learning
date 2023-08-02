@@ -54,7 +54,7 @@ class TimeSeriesModel:
 
         print("Your current architecture is compatible with the windowed dataset! :)")
 
-
+class ModelEval():
     def compute_metrics(self, true_series, forecast):
         mse = tf.keras.metrics.mean_squared_error(true_series, forecast).numpy()
         mae = tf.keras.metrics.mean_absolute_error(true_series, forecast).numpy()
@@ -68,9 +68,8 @@ class TimeSeriesModel:
         forecast = model.predict(ds)
         return forecast
 
-    def plot_series(self, time, series, format="-", start=0, end=None):
-        plt.plot(time[start:end], series[start:end], format)
+    def plot_series(self, time, series, format="-", start=0, end=None, label=None, color=None):
+        plt.plot(time[start:end], series[start:end], format, label=label, color=color)
         plt.xlabel("Time")
         plt.ylabel("Value")
         plt.grid(True)
-

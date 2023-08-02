@@ -1,6 +1,6 @@
 from data_prep import DataProcessor, DataLoading
 import numpy as np
-from model import TimeSeriesModel
+from model import TimeSeriesModel, ModelEval
 import matplotlib.pyplot as plt
 
 #Data Loading 
@@ -31,9 +31,9 @@ history = model.train(training_data, epochs=30)
 model.test(training_data)
 
 #forecasting and evaluation on validation set
-forecast = model.model_forecast(series, window_size).squeeze()
+forecast = ModelEval.model_forecast(series, window_size).squeeze()
 forecast = forecast[split_time - window_size:-1]
-mse, mae = TimeSeriesModel.compute_metrics(series_validset, forecast)
+mse, mae = ModelEval.compute_metrics(series_validset, forecast)
 print(f"mse: {mse:.2f}, mae: {mae:.2f} for forecast")
 
 
@@ -41,8 +41,8 @@ print(f"mse: {mse:.2f}, mae: {mae:.2f} for forecast")
 #THIS IS AN ADDITIONAL SCRIPT TO PLOT THE ACTUAL DATA VS PREDICTED DATA ON THE VALIDSET 
 #YOU CAN RUN THIS ON A NOTEBOOK
 # plt.figure(figsize=(10, 6))
-# model.plot_series(time_valid, series_validset, label='Actual Data', color='blue')
-# model.plot_series(time_valid, forecast, label='Predicted Data', color='red')
+# ModelEval.plot_series(time_valid, series_validset, label='Actual Data', color='blue')
+# ModelEval.plot_series(time_valid, forecast, label='Predicted Data', color='red')
 # plt.legend()
 # plt.title('Actual vs. Predicted Data (Validation)')
 # plt.show()
