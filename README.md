@@ -14,13 +14,28 @@
 - The dataset I used is the [Jena Climate dataset](https://www.kaggle.com/datasets/mnassrib/jena-climate) is made up of 14 different quantities (such air temperature, atmospheric pressure, humidity, wind direction, and so on) were recorded every 10 minutes, over several years. This dataset covers data from January 1st 2009 to December 31st 2016.
 
 ## Usage
-- This is how you can train the model as I have in the notebook or on an IDE on any of the columns in the dataset.
-- Clone the repository: `git clone https://github.com/KevKibe/KevKibe/TimeSeries-Prediction-on-climate-data-using-Deep-Learning`
-- Navigate to the project directory: `cd TimeSeries-Prediction-on-climate-data-using-Deep-Learning`
-- Install the dependencies: `pip install -r requirements.txt`
-- In the main.py file you can change the column name `Temperature (degC)` in this line `times, temperatures = data_processor.parse_data_from_dataframe(climate_df, 'Temperature (degC)')` 
-  to train a model on any column you wish.
-- Run the command `python main.py` which will train the model and then return the MAE and MSE.
+- This is how you can train the model as I have in the [notebook](https://github.com/KevKibe/TimeSeries-Prediction-on-climate-data-using-Deep-Learning/blob/main/time_series_notebook.ipynb) or on an IDE on any of the columns in the dataset.
+- Clone the repository:
+```
+git clone https://github.com/KevKibe/KevKibe/TimeSeries-Prediction-on-climate-data-using-Deep-Learning
+ ```
+- Navigate to the project directory:
+```
+cd TimeSeries-Prediction-on-climate-data-using-Deep-Learning
+```
+- Install the dependencies:
+```
+pip install -r requirements.txt
+```
+- In the main.py file you can change the column name `Temperature (degC)` in this line to train a model on any column you wish.
+```
+times, temperatures = data_processor.parse_data_from_dataframe(climate_df, 'Temperature (degC)')
+```
+ 
+- Run the command which will train the model and then return the MAE and MSE.
+```
+  python main.py
+```
 - You can go ahead and plot the predicted vs the actual validation data
 
 ## Model
