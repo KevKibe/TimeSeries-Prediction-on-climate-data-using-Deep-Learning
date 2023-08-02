@@ -44,7 +44,7 @@ def preprocess_data():
     time_train, series_trainset, time_valid, series_validset = data_processor.train_val_split(climate_df.index,
                                                                                                temperatures,
                                                                                                time_step=294000)
-    return model, climate_df, series_validset, time_valid
+    return model, climate_df, series_validset, time_valid, series
 
 
 def plot_future_forecast(model, series, time_valid, window_size, future_months):
@@ -56,16 +56,12 @@ def plot_future_forecast(model, series, time_valid, window_size, future_months):
 
     fig = go.Figure()
 
-    # Plot the actual data
     fig.add_trace(go.Scattergl(x=time_valid, y=series, mode='lines', name='Actual Data', line=dict(color='salmon')))
 
-    # Plot the predicted data (future forecast)
     fig.add_trace(go.Scattergl(x=future_time, y=future_forecast, mode='lines', name='Predicted Data (Future)', line=dict(color='green')))
 
-    # Set axis labels and title
     fig.update_layout(title='Actual vs. Predicted Data', xaxis_title='Time', yaxis_title='Value', width=1000, height=600)
 
-    # Show the figure
     st.plotly_chart(fig)
 
 
@@ -74,16 +70,13 @@ def streamlit_app():
     climate_df, model = fetch_data()
     plot_climate_data(climate_df)
 
-    model, climate_df, series_validset, time_valid = preprocess_data()
+    model, climate_df, series_validset, time_valid, series = preprocess_data()
 
-    
-
-    # Add a slider to select the number of years into the future for forecasting
     future_years = st.slider("Select Years into the Future for Forecasting(takes approx. 2mins)", 0, 1, 10)
     future_months = future_years * 12
     window_size = 64
     with st.spinner("Forecasting..."):
-        plot_future_forecast(model=model, series=series_validset, time_valid=time_valid, window_size = window_size,
+        plot_future_forecast(model=model, series=series, time_valid=time_valid, window_size = window_size,
                          future_months=future_months)
 
 
