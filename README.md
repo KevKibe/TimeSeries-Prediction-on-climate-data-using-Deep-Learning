@@ -6,6 +6,7 @@
 
 - This is a time-series forecasting application on climate data specifically temperature data using a deep learning model
 - The application has a myriad of uses such as getting climate data forecasts.
+- You can try out this interactive [streamlt application](https://time-series-using-rnn.streamlit.app/) for forecasting future temperature data.
 
 ## Dataset
 - The dataset I used is the [Jena Climate dataset](https://www.kaggle.com/datasets/mnassrib/jena-climate) is made up of 14 different quantities (such air temperature, atmospheric pressure, humidity, wind direction, and so on) were recorded every 10 minutes, over several years. This dataset covers data from January 1st 2009 to December 31st 2016.
