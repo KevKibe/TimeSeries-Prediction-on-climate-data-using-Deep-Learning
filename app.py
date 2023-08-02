@@ -74,9 +74,13 @@ def plot_future_forecast(model, series, time_valid, future_months):
 
 
 def streamlit_app():
+    
+    climate_df, model = fetch_data()
+    plot_climate_data(climate_df)
+
     model, climate_df, series_validset, time_valid = preprocess_data()
 
-    plot_climate_data(climate_df)
+    
 
     # Add a slider to select the number of years into the future for forecasting
     future_years = st.slider("Select Years into the Future for Forecasting", 0, 1, 10)
