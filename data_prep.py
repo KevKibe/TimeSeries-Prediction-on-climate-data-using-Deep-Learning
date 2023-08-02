@@ -33,10 +33,13 @@ class DataLoading:
             'rho (g/m**3)': 'Air Density (g/m^3)',
             'wv (m/s)': 'Wind Speed (m/s)',
             'max. wv (m/s)': 'Maximum Wind Speed (m/s)',
-            'wd (deg)': 'Wind Direction (deg)'
+            'wd (deg)': 'Wind Direction (deg)',
+            'Date Time' : 'Date Time'
         }
 
         self.climate_df.rename(columns=new_column_names, inplace=True)
+        if 'Date Time' in self.climate_df.columns:
+            self.climate_df.set_index('Date Time', inplace=True)
 
 
 class DataProcessor:
