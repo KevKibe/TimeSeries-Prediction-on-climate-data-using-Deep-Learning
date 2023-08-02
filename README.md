@@ -1,5 +1,7 @@
 ## TimeSeries-Prediction-on-climate-data-using-Deep-Learning
-![newplot](https://github.com/KevKibe/TimeSeries-Prediction-on-climate-data-using-Deep-Learning/assets/86055894/f9cbc76a-7266-44d0-a50f-b1cc236bfc5e)
+
+![image](https://github.com/KevKibe/TimeSeries-Prediction-on-climate-data-using-Deep-Learning/assets/86055894/1bddae41-aefe-4f53-9191-58c547895786)
+
 
 ## Description
 
