@@ -51,8 +51,8 @@ def plot_future_forecast(model, series, time_valid, window_size, future_months):
     last_timestamp = time_valid[-1]
     future_time_steps = future_months * 30 * 24 * 6  # Assuming 30 days per month (24 hours * 6 10-minute intervals per hour)
     future_time = pd.date_range(start=last_timestamp, periods=future_time_steps+1, freq='10T')[1:]
-
-    future_forecast = ModelEval.model_forecast(model, series, window_size, future_time_steps)
+    model_forecast = ModelEval()
+    future_forecast = model_forecast.model_forecast(model, series, window_size, future_time_steps)
 
     fig = go.Figure()
 
@@ -82,7 +82,7 @@ def streamlit_app():
     future_years = st.slider("Select Years into the Future for Forecasting(takes approx. 2mins)", 0, 1, 10)
     future_months = future_years * 12
     window_size = 64
-    plot_future_forecast(model=model, series=series_validset, window_size = window_size,time_valid=time_valid,
+    plot_future_forecast(model=model, series=series_validset, time_valid=time_valid, window_size = window_size,
                          future_months=future_months)
 
 
