@@ -72,7 +72,7 @@ def streamlit_app():
 
     model, climate_df, series_validset, time_valid, series = preprocess_data()
 
-    future_years = st.slider("Select Years into the Future for Forecasting(takes approx. 2mins)", 0, 1, 10)
+    future_years = st.slider("Select Years into the Future for Forecasting(takes longer for predictions further down into the future)", 0, 1, 10)
     future_months = future_years * 12
     window_size = 64
     with st.spinner("Forecasting..."):
